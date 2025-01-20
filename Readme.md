@@ -1,4 +1,4 @@
-# Moder Todo Application
+# Modern Todo Application
 
 ## Technical Stack:
 
