@@ -1,4 +1,5 @@
-const Todo = require('../models/todos');
+const Todo = require('../models/todos'),
+  mongoose = require('mongoose');
 
 exports.createTodo = async (req, res) => {
   try {
@@ -27,7 +28,7 @@ exports.createTodo = async (req, res) => {
 
 exports.getTodo = async (req, res) => {
   try {
-    const todos = await Todo.find()
+    const todos = await Todo.find({ userId: req.user._id.toString() })
       .populate('userId', 'name _id')
       .select('-__v');
 
@@ -40,12 +41,36 @@ exports.getTodo = async (req, res) => {
   }
 };
 
+exports.getByIdTodo = async (req, res) => {
+  try {
+    const { _id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+      return res.status(400).json({ error: 'Invalid Todo ID' });
+    }
+
+    const todo = await Todo.findById(_id)
+      .populate('userId', 'name _id')
+      .select('-__v');
+
+    if (!todo) {
+      return res.status(404).json({ error: 'Todo not found' });
+    }
+
+    res.status(200).json({ Msg: "Todo Get Successfully", Todo: todo });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
 exports.updateTodo = async (req, res) => {
   try {
     const { _id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+      return res.status(400).json({ error: 'Invalid Todo ID' });
+    }
     const update = req.body;
     const todos = await Todo.findByIdAndUpdate(
-      { _id, user: req.user._id },
+      _id,
       update,
       { new: true }
     )
@@ -64,10 +89,11 @@ exports.updateTodo = async (req, res) => {
 exports.deleteTodo = async (req, res) => {
   try {
     const { _id } = req.params;
-    if (!_id) return res.status(400).json({ error: 'Todo ID is required' });
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+      return res.status(400).json({ error: 'Invalid Todo ID' });
+    }
     const todos = await Todo.findByIdAndDelete({
-      _id,
-      user: req.user._id,
+      _id
     });
     if (!todos) return res.status(404).json({ error: 'Todo not found' });
     res.json({ message: `${_id} Todo deleted successfully` });
