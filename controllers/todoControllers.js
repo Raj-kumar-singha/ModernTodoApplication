@@ -27,17 +27,6 @@ exports.createTodo = async (req, res) => {
 
 exports.getTodo = async (req, res) => {
   try {
-    // const { status } = req.query;
-    // const userId = req.user._id; 
-
-    // const query = { user: userId };
-
-    // // Add status filter if provided
-    // if (status) {
-    //   query.status = status;
-    // }
-
-    // Fetch todos for the logged-in user
     const todos = await Todo.find()
       .populate('userId', 'name _id')
       .select('-__v');
@@ -75,6 +64,7 @@ exports.updateTodo = async (req, res) => {
 exports.deleteTodo = async (req, res) => {
   try {
     const { _id } = req.params;
+    if (!_id) return res.status(400).json({ error: 'Todo ID is required' });
     const todos = await Todo.findByIdAndDelete({
       _id,
       user: req.user._id,
