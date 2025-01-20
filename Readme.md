@@ -28,17 +28,3 @@ DB_URL="mongodb+srv://Node_Assessment:Assessment@cluster0.66svo.mongodb.net/todo
 JWT_SECRET = new_secret
 
 ```
-
-## Setup For Client
-
-1. Clone the repository.
-2. Go Client durectory using cd Client
-3. Install the dependencies by running 
-```
-npm install
-```
-3. Set up the environment variables in `.env` file.
-4. Start the server using 
-```
-npm run dev
-```
